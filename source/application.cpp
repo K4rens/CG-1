@@ -16,19 +16,18 @@
 namespace application {
 
 // Состояние интерфейса для дополнительных заданий
-bool isOrthographic = false;                // Задание 1
-glm::vec3 objPosition = {0.0f, 0.0f, 0.0f}; // Задание 2
-glm::vec3 objRotation = {0.0f, 0.0f, 0.0f}; // Задание 2
-glm::vec3 objScale = {1.0f, 1.0f, 1.0f};    // Задание 2
+bool isOrthographic = false;                
+glm::vec3 objPosition = {0.0f, 0.0f, 0.0f};
+glm::vec3 objRotation = {0.0f, 0.0f, 0.0f}; 
+glm::vec3 objScale = {1.0f, 1.0f, 1.0f};    
 
-bool isAnimating = false;                   // Задание 3
-float animSpeed = 1.0f;                     // Задание 3
-float animRadius = 2.0f;                    // Задание 3
-float currentAnimTime = 0.0f;               // Задание 3
+bool isAnimating = false;                   
+float animSpeed = 1.0f;                     
+float animRadius = 2.0f;                    
+float currentAnimTime = 0.0f;               
 
-glm::vec3 objColor = {1.0f, 1.0f, 1.0f};    // Задания 4 и 5
+glm::vec3 objColor = {1.0f, 1.0f, 1.0f};
 
-// Структура, которая улетает в шейдер (ровно 80 байт)
 struct PushConstants {
     glm::mat4 mvp;
     glm::vec4 colorMultiplier;
@@ -65,8 +64,8 @@ void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkBuffer& buffer,
     }
 }
 
-// Задание 5: Процедурное назначение цвета в зависимости от позиции вершины
-void generateSphere(float radius, int sectorCount, int stackCount) {
+
+void generateSphere(float radius, int sectorCount, int stackCount) {  //горизонтали вертикали
     sphereVertices.clear();
     sphereIndices.clear();
 
@@ -74,12 +73,12 @@ void generateSphere(float radius, int sectorCount, int stackCount) {
     float stackStep = M_PI / stackCount;
 
     for (int i = 0; i <= stackCount; ++i) {
-        float stackAngle = M_PI / 2.0f - i * stackStep;
+        float stackAngle = M_PI / 2.0f - i * stackStep; //широта от +90 до -=90
         float y = radius * sinf(stackAngle);
         float xy = radius * cosf(stackAngle);
 
         for (int j = 0; j <= sectorCount; ++j) {
-            float sectorAngle = j * sectorStep;
+            float sectorAngle = j * sectorStep;  //долгота от 0 до 360
             float x = xy * cosf(sectorAngle);
             float z = xy * sinf(sectorAngle);
 
@@ -98,7 +97,7 @@ void generateSphere(float radius, int sectorCount, int stackCount) {
         int k1 = i * (sectorCount + 1);
         int k2 = k1 + sectorCount + 1;
 
-        for (int j = 0; j < sectorCount; ++j, ++k1, ++k2) {
+        for (int j = 0; j < sectorCount; ++j, ++k1, ++k2) {    //цвет каждой вершины
             if (i != 0) {
                 sphereIndices.push_back(k1);
                 sphereIndices.push_back(k1 + 1);
@@ -150,13 +149,13 @@ void initPipeline() {
     VkShaderModule vertModule = buildShaderModule(vertCode);
     VkShaderModule fragModule = buildShaderModule(fragCode);
 
-    VkPipelineShaderStageCreateInfo vertStageInfo{};
+    VkPipelineShaderStageCreateInfo vertStageInfo{}; //шейдеры на вершины
     vertStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     vertStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
     vertStageInfo.module = vertModule;
     vertStageInfo.pName = "main";
 
-    VkPipelineShaderStageCreateInfo fragStageInfo{};
+    VkPipelineShaderStageCreateInfo fragStageInfo{}; //шейдеры на фрагменты
     fragStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     fragStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
     fragStageInfo.module = fragModule;
@@ -178,7 +177,7 @@ void initPipeline() {
     attributeDescriptions[1].binding = 0;
     attributeDescriptions[1].location = 1;
     attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-    attributeDescriptions[1].offset = sizeof(glm::vec3);
+    attributeDescriptions[1].offset = sizeof(glm::vec3);           //как gpu забирает инфу
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -189,14 +188,14 @@ void initPipeline() {
 
     VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;    //3 индекса = треугольник
     inputAssembly.primitiveRestartEnable = VK_FALSE;
 
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
     viewport.width = (float) graphics::internal::context.swapchain_extent.width;
-    viewport.height = (float) graphics::internal::context.swapchain_extent.height;
+    viewport.height = (float) graphics::internal::context.swapchain_extent.height;  //создание вьюпорта для exe
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
@@ -215,7 +214,7 @@ void initPipeline() {
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     rasterizer.depthClampEnable = VK_FALSE;
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
-    rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+    rasterizer.polygonMode = VK_POLYGON_MODE_FILL;   //если line то будет просто карскс типа
     rasterizer.lineWidth = 1.0f;
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT; 
     rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE; 
@@ -243,7 +242,6 @@ void initPipeline() {
     depthStencil.depthBoundsTestEnable = VK_FALSE;
     depthStencil.stencilTestEnable = VK_FALSE;
 
-    // Обновляем размер Push Constants под новую структуру (матрица + цвет)
     VkPushConstantRange pushConstantRange{};
     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
     pushConstantRange.offset = 0;
@@ -311,21 +309,21 @@ void update(double time) {
 
     ImGui::Begin("Controls");
 
-    // Задание 1: Переключение матрицы проекции
+    // Переключение матрицы проекции
     ImGui::Text("Projection");
     if (ImGui::RadioButton("Perspective", !isOrthographic)) isOrthographic = false;
     ImGui::SameLine();
     if (ImGui::RadioButton("Orthographic", isOrthographic)) isOrthographic = true;
     ImGui::Separator();
 
-    // Задание 2: Элементы интерфейса для трансформаций
+    //Элементы интерфейса для трансформаций
     ImGui::Text("Transformations");
     ImGui::SliderFloat3("Position", &objPosition.x, -5.0f, 5.0f);
     ImGui::SliderFloat3("Rotation", &objRotation.x, -180.0f, 180.0f);
     ImGui::SliderFloat3("Scale", &objScale.x, 0.1f, 5.0f);
     ImGui::Separator();
 
-    // Задание 3: Движение по сложной траектории
+    // Движение по сложной траектории
     ImGui::Text("Animation");
     ImGui::Checkbox("Play / Pause", &isAnimating);
     ImGui::SliderFloat("Speed", &animSpeed, 0.1f, 5.0f);
@@ -333,7 +331,7 @@ void update(double time) {
     
     if (isAnimating) {
         currentAnimTime += deltaTime * animSpeed;
-        // Траектория в форме восьмерки (Лемниската) + вращение
+        // Траектория + вращение
         objPosition.x = sin(currentAnimTime) * animRadius;
         objPosition.y = sin(currentAnimTime * 2.0f) * (animRadius * 0.5f);
         objPosition.z = cos(currentAnimTime) * (animRadius * 0.5f);
@@ -343,7 +341,7 @@ void update(double time) {
     }
     ImGui::Separator();
 
-    // Задание 4: Элемент интерфейса для изменения цвета
+    // Элемент интерфейса для изменения цвета
     ImGui::Text("Color");
     ImGui::ColorEdit3("Object Color", &objColor.x);
 
@@ -373,17 +371,15 @@ void render(const graphics::internal::FrameData& fd) {
 
     float aspect = (float)graphics::internal::context.swapchain_extent.width / (float)graphics::internal::context.swapchain_extent.height;
     
-    // Задание 1: Применение выбранной проекции
+    // Применение выбранной проекции
     glm::mat4 proj;
     if (isOrthographic) {
         float orthoSize = 3.0f;
-        // Изменили near plane на 0.1f, чтобы камера не "проглатывала" объекты
         proj = glm::ortho(-orthoSize * aspect, orthoSize * aspect, -orthoSize, orthoSize, 0.1f, 100.0f);
     } else {
         proj = glm::perspective(glm::radians(45.0f), aspect, 0.1f, 100.0f);
     }
-    
-    // Матрица коррекции для Vulkan: переворачивает Y и сжимает Z из [-1..1] (OpenGL) в [0..1] (Vulkan)
+
     glm::mat4 clipMatrix = glm::mat4(1.0f);
     clipMatrix[1][1] = -1.0f;
     clipMatrix[2][2] =  0.5f;
@@ -393,18 +389,18 @@ void render(const graphics::internal::FrameData& fd) {
 
     glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     
-    // Задания 2 и 3: Сборка матрицы модели на основе позиции, вращения и масштаба
+    // Сборка матрицы модели на основе позиции, вращения и масштаба, аффинные
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, objPosition);
     model = glm::rotate(model, glm::radians(objRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::rotate(model, glm::radians(objRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(objRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    model = glm::rotate(model, glm::radians(objRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));   
     model = glm::scale(model, objScale);
 
     // Заполнение структуры PushConstants
     PushConstants pcs{};
-    pcs.mvp = proj * view * model;
-    pcs.colorMultiplier = glm::vec4(objColor, 1.0f); // Задания 4 и 5
+    pcs.mvp = proj * view * model;    //модель в мир, камера на мир, проеция
+    pcs.colorMultiplier = glm::vec4(objColor, 1.0f);
 
     // Отправка матриц и цвета в шейдер
     vkCmdPushConstants(fd.command_buffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants), &pcs);
