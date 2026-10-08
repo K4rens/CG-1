@@ -101,13 +101,13 @@ void generateSphere(float radius, int sectorCount, int stackCount) {
         for (int j = 0; j < sectorCount; ++j, ++k1, ++k2) {
             if (i != 0) {
                 sphereIndices.push_back(k1);
-                sphereIndices.push_back(k2);
                 sphereIndices.push_back(k1 + 1);
+                sphereIndices.push_back(k2);
             }
             if (i != (stackCount - 1)) {
                 sphereIndices.push_back(k1 + 1);
-                sphereIndices.push_back(k2);
                 sphereIndices.push_back(k2 + 1);
+                sphereIndices.push_back(k2);
             }
         }
     }
@@ -278,7 +278,7 @@ void initPipeline() {
 }
 
 bool initialize() {
-    generateSphere(1.0f, 1000, 1000);
+    generateSphere(1.0f, 10, 10);
 
     VkDeviceSize vertexBufferSize = sizeof(Vertex) * sphereVertices.size();
     createBuffer(vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, vertexBuffer, vertexBufferAllocation, sphereVertices.data());
