@@ -8,7 +8,7 @@ namespace application {
 
 struct Vertex {
     glm::vec3 position;
-    glm::vec3 color;
+    glm::vec3 normal;
 };
 
 extern std::vector<Vertex> sphereVertices;

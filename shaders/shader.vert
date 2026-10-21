@@ -1,17 +1,29 @@
 #version 450
 
 layout(location = 0) in vec3 inPosition;
-layout(location = 1) in vec3 inColor;
+layout(location = 1) in vec3 inNormal;
 
-layout(location = 0) out vec3 fragColor;
+layout(set = 0, binding = 0) uniform SceneUBO {
+    mat4 view;
+    mat4 proj;
+    vec4 viewPos;
+    vec4 ambientColor;
+    vec4 dirLightDir;
+    vec4 dirLightColor;
+} scene;
 
-layout(push_constant) uniform PushConstants {
-    mat4 mvp;
-    vec4 colorMultiplier;
-} pcs;
+layout(set = 1, binding = 0) uniform ObjectUBO {
+    mat4 model;
+    vec4 albedo;
+    vec4 specular;
+} object;
+
+layout(location = 0) out vec3 fragWorldPos;
+layout(location = 1) out vec3 fragNormal;
 
 void main() {
-    gl_Position = pcs.mvp * vec4(inPosition, 1.0);
-    // Задание 5: Умножение процедурного цвета вершин на выбранный в интерфейсе цвет
-    fragColor = inColor * pcs.colorMultiplier.rgb;
+    vec4 worldPos = object.model * vec4(inPosition, 1.0);
+    fragWorldPos = worldPos.xyz;
+    fragNormal = mat3(transpose(inverse(object.model))) * inNormal;
+    gl_Position = scene.proj * scene.view * worldPos;
 }
