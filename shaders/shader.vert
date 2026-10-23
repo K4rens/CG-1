@@ -10,6 +10,10 @@ layout(set = 0, binding = 0) uniform SceneUBO {
     vec4 ambientColor;
     vec4 dirLightDir;
     vec4 dirLightColor;
+    int pointLightCount;
+    int spotLightCount;
+    int pad1;
+    int pad2;
 } scene;
 
 layout(set = 1, binding = 0) uniform ObjectUBO {
